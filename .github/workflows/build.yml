@@ -1,0 +1,58 @@
+name: 多平台自动打包 (Windows & Linux)
+
+on:
+  push:
+    tags:
+      - 'v*' # 触发条件：当你推送以 v 开头的标签时，例如 v1.0
+
+jobs:
+  build:
+    name: 打包 - ${{ matrix.os }}
+    strategy:
+      matrix:
+        # 同时启动 Windows 和 Linux 两台虚拟机
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'oracle'
+          cache: maven
+
+      - name: Maven 编译并打包 JAR
+        run: mvn clean package -DskipTests
+
+      - name: Windows 平台生成 EXE
+        if: matrix.os == 'windows-latest'
+        run: |
+          # 使用 jpackage 将 target 下的 jar 转为 exe
+          # 注意：--main-jar 的名字要和你 target 目录下生成的 jar 包名一致
+          jpackage --name "HotelApp" `
+                   --input target/ `
+                   --main-jar hotel_management_app.jar `
+                   --main-class me.amboo.Main `
+                   --type exe `
+                   --dest output/
+
+      - name: Linux 平台生成 DEB 安装包
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get install -y fakeroot
+          jpackage --name "HotelApp" \
+                   --input target/ \
+                   --main-jar hotel_management_app.jar \
+                   --main-class me.amboo.Main \
+                   --type deb \
+                   --dest output/
+
+      - name: 上传构建结果
+        uses: actions/upload-artifact@v4
+        with:
+          name: HotelApp-${{ matrix.os }}
+          path: output/*
