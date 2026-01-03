@@ -3,7 +3,10 @@ name: 多平台自动打包 (Windows & Linux)
 on:
   push:
     tags:
-      - 'v*' # 触发条件：当你推送以 v 开头的标签时，例如 v1.0
+      - 'v*' 
+    branches:
+      - main  # 这样你每次 git push 代码到 main 分支，也会自动运行打包
+  workflow_dispatch: # <-- 添加这一行，开启手动触发开关
 
 jobs:
   build:
