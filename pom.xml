@@ -22,7 +22,8 @@
     </dependencies>
 
     <build>
-        <finalName>hotel_management_app</finalName> <resources>
+        <finalName>hotel_management_app</finalName>
+        <resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
@@ -56,13 +57,28 @@
                         <phase>package</phase>
                         <goals><goal>shade</goal></goals>
                         <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>me.amboo.Main</mainClass> </transformer>
+                                    <mainClass>me.amboo.Main</mainClass>
+                                </transformer>
                             </transformers>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>me.amboo.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>
