@@ -30,13 +30,29 @@ jobs:
       - name: Maven 编译
         run: mvn clean package -DskipTests
 
-      - name: 验证 JAR 文件
+      - name: 验证 JAR 文件 (Windows)
+        if: matrix.os == 'windows-latest'
         run: |
           echo "=== 检查 target 目录 ==="
-          ls -lh target/*.jar 2>/dev/null || echo "未找到 JAR 文件"
-          echo ""
-          echo "=== 完整的 target 目录内容 ==="
-          ls -la target/ | head -20
+          if (Test-Path "target\hotel_management_app.jar") {
+            echo "✓ 找到 hotel_management_app.jar"
+            dir target\*.jar
+          } else {
+            echo "✗ 未找到 JAR 文件"
+            dir target\
+          }
+
+      - name: 验证 JAR 文件 (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          echo "=== 检查 target 目录 ==="
+          if [ -f "target/hotel_management_app.jar" ]; then
+            echo "✓ 找到 hotel_management_app.jar"
+            ls -lh target/*.jar
+          else
+            echo "✗ 未找到 JAR 文件"
+            ls -la target/
+          fi
 
       - name: Windows 平台生成 EXE
         if: matrix.os == 'windows-latest'
