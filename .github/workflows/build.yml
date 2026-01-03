@@ -37,7 +37,7 @@ jobs:
                    --input target/ `
                    --main-jar hotel_management_app.jar `
                    --main-class me.amboo.Main `
-                   --type exe `
+                   --type app-image `
                    --dest output/
 
       - name: Linux 平台生成便携式程序 (App Image)
