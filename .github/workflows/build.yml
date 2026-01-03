@@ -33,26 +33,32 @@ jobs:
       - name: Windows 平台生成 EXE
         if: matrix.os == 'windows-latest'
         run: |
-          # 1. 创建一个专门存放待打包文件的干净目录
+          # 1. 创建输入目录结构
           mkdir input_dir
           
-          # 2. 只把生成的 Fat JAR 拷贝进去
-          # 注意：请确保你的 pom.xml 中设置了 <finalName>hotel_management_app</finalName>
-          cp target/hotel_management_app.jar input_dir/
+          # 2. 拷贝生成的 Fat JAR
+          copy target\hotel_management_app.jar input_dir\
           
-          # 3. 让 jpackage 只读取这个干净的 input_dir
+          # 3. 使用 jpackage 打包应用
           jpackage --name "HotelApp" `
-                   --input target/ `
+                   --input input_dir `
                    --main-jar hotel_management_app.jar `
                    --main-class me.amboo.Main `
                    --type app-image `
-                   --dest output/
+                   --dest output
 
       - name: Linux 平台生成便携式程序 (App Image)
         if: matrix.os == 'ubuntu-latest'
         run: |
+          # 1. 创建输入目录结构
+          mkdir -p input_dir
+          
+          # 2. 拷贝生成的 Fat JAR
+          cp target/hotel_management_app.jar input_dir/
+          
+          # 3. 使用 jpackage 打包应用
           jpackage --name "HotelApp" \
-                   --input target/ \
+                   --input input_dir \
                    --main-jar hotel_management_app.jar \
                    --main-class me.amboo.Main \
                    --type app-image \
