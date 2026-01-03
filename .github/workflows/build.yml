@@ -2,18 +2,17 @@ name: 多平台自动打包 (Windows & Linux)
 
 on:
   push:
-    tags:
-      - 'v*' 
     branches:
-      - main  # 这样你每次 git push 代码到 main 分支，也会自动运行打包
-  workflow_dispatch: # <-- 添加这一行，开启手动触发开关
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
   build:
     name: 打包 - ${{ matrix.os }}
     strategy:
       matrix:
-        # 同时启动 Windows 和 Linux 两台虚拟机
         os: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
@@ -28,14 +27,12 @@ jobs:
           distribution: 'oracle'
           cache: maven
 
-      - name: Maven 编译并打包 JAR
+      - name: Maven 编译
         run: mvn clean package -DskipTests
 
       - name: Windows 平台生成 EXE
         if: matrix.os == 'windows-latest'
         run: |
-          # 使用 jpackage 将 target 下的 jar 转为 exe
-          # 注意：--main-jar 的名字要和你 target 目录下生成的 jar 包名一致
           jpackage --name "HotelApp" `
                    --input target/ `
                    --main-jar hotel_management_app.jar `
@@ -43,19 +40,20 @@ jobs:
                    --type exe `
                    --dest output/
 
-      - name: Linux 平台生成 DEB 安装包
+      - name: Linux 平台生成便携式程序 (App Image)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo apt-get install -y fakeroot
           jpackage --name "HotelApp" \
                    --input target/ \
                    --main-jar hotel_management_app.jar \
                    --main-class me.amboo.Main \
-                   --type deb \
+                   --type app-image \
                    --dest output/
+          # 将输出目录重命名，方便识别
+          mv output/HotelApp output/HotelApp-Linux-Portable
 
       - name: 上传构建结果
         uses: actions/upload-artifact@v4
         with:
           name: HotelApp-${{ matrix.os }}
-          path: output/*
+          path: output/
