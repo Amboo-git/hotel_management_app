@@ -33,6 +33,14 @@ jobs:
       - name: Windows 平台生成 EXE
         if: matrix.os == 'windows-latest'
         run: |
+          # 1. 创建一个专门存放待打包文件的干净目录
+          mkdir input_dir
+          
+          # 2. 只把生成的 Fat JAR 拷贝进去
+          # 注意：请确保你的 pom.xml 中设置了 <finalName>hotel_management_app</finalName>
+          cp target/hotel_management_app.jar input_dir/
+          
+          # 3. 让 jpackage 只读取这个干净的 input_dir
           jpackage --name "HotelApp" `
                    --input target/ `
                    --main-jar hotel_management_app.jar `
