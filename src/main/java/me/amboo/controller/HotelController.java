@@ -157,8 +157,8 @@ public class HotelController {
         try {
             List<Integer> topoOrder = sorter.execute(aov);
             String orderStr = topoOrder.stream()
-                    .map(String::valueOf)
-                    .collect(Collectors.joining(" -> "));
+                    .map(String::valueOf) // 将流中的每个 Integer 转换为 String
+                    .collect(Collectors.joining(" -> ")); // 作用是将流中的元素用 " -> " 连接起来
             System.out.println(">> 合法的查房拓扑序列：");
             System.out.println(orderStr);
         } catch (IllegalStateException e) {

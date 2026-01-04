@@ -4,6 +4,7 @@ import java.util.*;
 
 public class AOECalculator {
 
+    // 计算关键路径
     public void calculateCriticalPath(AOENetwork network) {
         List<Integer> topoOrder = performTopologicalSort(network);
         if (topoOrder == null) return;
@@ -12,13 +13,16 @@ public class AOECalculator {
         Map<Integer, Integer> ve = new HashMap<>();
         Map<Integer, Integer> vl = new HashMap<>();
 
-        // 1. 正向拓扑序列计算 ve (Earliest Event Time)
-        allIDs.forEach(id -> ve.put(id, 0));
-        for (int u : topoOrder) {
-            for (Map.Entry<Integer, Integer> entry : network.getAdjList().get(u).entrySet()) {
-                int v = entry.getKey();
-                int weight = entry.getValue();
-                if (ve.get(v) < ve.get(u) + weight) {
+        // 1. 正向拓扑序列计算 ve (最早发生时间)
+        allIDs.forEach(id -> ve.put(id, 0)); // 对 allIDs 表进行初始化
+        for (int u : topoOrder) {                  //  按拓扑排序顺序遍历u
+            for (Map.Entry<Integer, Integer> entry : 
+                    network.getAdjList()   // 获取邻接表 (RoomID -> Map<邻接房间ID, 边权值>)
+                        .get(u)            // 获得id为u映射的值，也就是一个Map<邻接房间ID, 边权值>
+                        .entrySet()) {     // 把房间u的邻接表Map<邻接房间ID, 边权值>，拆解成一个个散装<邻接房间ID, 边权值>
+                int v = entry.getKey();    // 这里的Key是邻接房间的ID
+                int weight = entry.getValue();   // Value是对应的权值
+                if (ve.get(v) < ve.get(u) + weight) { // 如果 下一节点的权重 < 下一节点权重 + 边权值
                     ve.put(v, ve.get(u) + weight);
                 }
             }

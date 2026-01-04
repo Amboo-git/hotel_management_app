@@ -15,6 +15,7 @@ public class AOENetwork {
         inDegreeMap.clear();
         roomNodes.clear();
 
+        // 将列表中的 Room 依次导入本程序的三个map
         for (Room r : rooms) {
             int rid = r.getRoomID();
             roomNodes.put(rid, r);
@@ -25,7 +26,12 @@ public class AOENetwork {
         // 按照 AOV 网的逻辑分组与排序楼层
         Map<Integer, List<Room>> roomsByFloor = rooms.stream()
                 .collect(Collectors.groupingBy(r -> r.getRoomID() / 100));
-        List<Integer> sortedFloors = roomsByFloor.keySet().stream().sorted().collect(Collectors.toList());
+        // 结果: 返回一个 Map<楼层，楼层号>
+
+        List<Integer> sortedFloors = roomsByFloor.keySet()
+            .stream()
+            .sorted()
+            .collect(Collectors.toList());
 
         for (int i = 0; i < sortedFloors.size() - 1; i++) {
             List<Room> currentFloor = roomsByFloor.get(sortedFloors.get(i));
