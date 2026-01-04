@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 public class AOVNetwork {
     // 邻接表：RoomID -> 邻接房间号列表
     private Map<Integer, List<Integer>> adjList = new HashMap<>();
+    // 存储邻接表，表示每个房间的后继房间列表
 
     // 入度表：RoomID -> 入度数
     private Map<Integer, Integer> inDegreeMap = new HashMap<>();
@@ -42,11 +43,13 @@ public class AOVNetwork {
         // 2. 将房间按楼层分组 (楼层计算逻辑：RoomID / 100)
         Map<Integer, List<Room>> roomsByFloor = rooms.stream()
                 .collect(Collectors.groupingBy(r -> r.getRoomID() / 100));
+                // collect 返回值: Map<K, List<T>>，键是分组规则的结果，值是属于该分组的元素列表
 
         // 3. 获取所有存在房间的楼层，并按升序排列
         List<Integer> sortedFloors = roomsByFloor.keySet().stream()
                 .sorted()
                 .collect(Collectors.toList());
+                // collect：将排序后的结果依次手机进本列表
 
         // 4. 遍历楼层，尝试在相邻的“有房楼层”之间建立边
         // 注意：循环到倒数第二个楼层即可，最高层不需要指向更高处
@@ -89,7 +92,7 @@ public class AOVNetwork {
         return inDegreeMap.getOrDefault(roomID, 0);
     }
 
-    // 获取特定房间的所有邻接（后继）节点
+    // 返回指定节点的邻接节点列表
     public List<Integer> getNeighbors(int roomID) {
         return adjList.getOrDefault(roomID, new ArrayList<>());
     }
